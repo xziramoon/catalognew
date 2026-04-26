@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="referrer" content="no-referrer">
+    <title>Wong Wian Catalog (Fast Upload)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    
+    <style>
+        /* --- THEME: LUXURY GOLD --- */
+        :root {
+            --primary: #c5a059;       
+            --primary-dark: #b08d4b;
+            --bg-body: #f9f9f9;
+            --surface: #ffffff;
+            --text-main: #2d3436;
+            --text-sub: #636e72;
+            --accent-green: #00b894;
+            --accent-red: #d63031;
+            
+            --radius-box: 18px;
+            --radius-btn: 12px;
+            --shadow-card: 0 4px 15px rgba(0,0,0,0.04);
+        }
+
+        body { 
+            font-family: 'Prompt', sans-serif; 
+            background-color: var(--bg-body); 
+            color: var(--text-main); 
+            margin: 0; padding: 20px; 
+            padding-bottom: 120px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* --- UI COMPONENTS --- */
+        .header { 
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; 
+            background: white; padding: 15px 20px; border-radius: var(--radius-box);
+            box-shadow: var(--shadow-card);
+        }
+        .brand { font-size: 1.5rem; font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
+        .brand-icon { width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary) 0%, #e5c585 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.4rem; }
+        .btn-setting { color: var(--text-sub); font-size: 1.5rem; cursor: pointer; transition: 0.3s; }
+
+        .search-container { position: sticky; top: 15px; z-index: 50; margin-bottom: 20px; }
+        .search-box { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); padding: 5px 20px; border-radius: 50px; display: flex; align-items: center; gap: 10px; box-shadow: 0 8px 30px rgba(0,0,0,0.06); border: 1px solid white; }
+        .input-clean { width: 100%; height: 50px; border: none; background: transparent; font-size: 1rem; outline: none; font-family: 'Prompt'; }
+
+        .cat-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 10px; scrollbar-width: none; }
+        .chip { background: white; padding: 8px 20px; border-radius: 30px; white-space: nowrap; color: var(--text-sub); font-size: 0.9rem; border: 1px solid #eee; cursor: pointer; transition: 0.3s; }
+        .chip.active { background: var(--text-main); color: var(--primary); border-color: var(--text-main); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
+        .card { background: var(--surface); border-radius: var(--radius-box); overflow: hidden; position: relative; box-shadow: var(--shadow-card); transition: 0.2s; border: 1px solid white; display: flex; flex-direction: column; }
+        .card-img-wrap { position: relative; width: 100%; padding-top: 100%; background: #f4f4f4; }
+        .card-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+        
+        .card-actions-top { position: absolute; top: 10px; right: 10px; display: flex; gap: 8px; z-index: 10; }
+        .btn-icon-mini { width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.9); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer; color: var(--text-main); }
+
+        .card-body { padding: 15px; flex: 1; display: flex; flex-direction: column; }
+        .card-name { font-size: 1rem; font-weight: 600; margin-bottom: 5px; line-height: 1.4; color: var(--text-main); }
+        .card-code { display: inline-block; font-family: monospace; font-size: 0.85rem; color: var(--primary-dark); background: #fdf8ec; padding: 4px 8px; border-radius: 6px; margin-bottom: 12px; align-self: flex-start; }
+        .btn-gold-outline { width: 100%; padding: 10px; margin-top: auto; border-radius: var(--radius-btn); border: 1px solid #e0d0b0; background: white; color: var(--primary-dark); font-size: 0.95rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+
+        .fab-bar { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 20px; z-index: 100; background: rgba(255,255,255,0.95); backdrop-filter: blur(15px); padding: 10px 25px; border-radius: 60px; box-shadow: 0 15px 40px rgba(0,0,0,0.15); border: 1px solid white; }
+        .nav-item { font-size: 1.5rem; cursor: pointer; color: var(--text-sub); transition: 0.2s; }
+        .nav-main { width: 60px; height: 60px; background: linear-gradient(135deg, var(--primary) 0%, #dbae5e 100%); color: white; font-size: 2rem; box-shadow: 0 10px 20px rgba(197, 160, 89, 0.4); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-top: -30px; border: 4px solid var(--bg-body); }
+
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 200; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .modal-content { background: white; width: 85%; max-width: 380px; padding: 25px; border-radius: 25px; box-shadow: 0 30px 60px rgba(0,0,0,0.25); animation: zoomIn 0.3s ease; }
+        @keyframes zoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .inp { width: 100%; padding: 14px; border: 2px solid #eee; border-radius: 14px; font-size: 1rem; margin-bottom: 15px; box-sizing: border-box; font-family: 'Prompt'; outline: none; }
+        .btn-gold-full { width: 100%; padding: 15px; border-radius: 14px; border: none; background: linear-gradient(135deg, var(--primary) 0%, #dbae5e 100%); color: white; font-size: 1rem; font-weight: 600; cursor: pointer; box-shadow: 0 10px 20px rgba(197, 160, 89, 0.2); }
+        .btn-text { width: 100%; padding: 10px; background: transparent; color: var(--text-sub); border: none; cursor: pointer; margin-top: 5px; }
+
+        .loader-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.95); display:none; justify-content:center; align-items:center; flex-direction:column; border-radius:25px; z-index:10; }
+        .spinner { width: 35px; height: 35px; border: 4px solid #eee; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: #2d3436; color: white; padding: 10px 25px; border-radius: 50px; z-index: 3000; font-size: 0.9rem; opacity: 0; pointer-events: none; transition: 0.3s; }
+        .toast.show { bottom: 40px; opacity: 1; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="brand">
+            <div class="brand-icon"><i class="ri-vip-diamond-fill"></i></div>
+            <span id="brandName">ร้านวงเวียน</span>
+        </div>
+        <div class="btn-setting" onclick="openSettings()"><i class="ri-settings-4-line"></i></div>
+    </div>
+
+    <div class="search-container">
+        <div class="search-box">
+            <i class="ri-search-line" style="color:#b2bec3;"></i>
+            <input type="text" id="search" class="input-clean" placeholder="ค้นหา..." onkeyup="render()">
+            <i class="ri-close-circle-fill" style="cursor:pointer; color:#dfe6e9;" onclick="document.getElementById('search').value=''; render();"></i>
+        </div>
+    </div>
+
+    <div class="cat-scroll" id="catFilters"></div>
+    <div class="grid" id="grid"></div>
+
+    <div class="fab-bar">
+        <div class="nav-item" onclick="openCloudMenu()"><i class="ri-cloud-windy-line"></i></div>
+        <div class="nav-main" onclick="openModalAdd()"><i class="ri-add-line"></i></div>
+        <div class="nav-item" onclick="openFavModal()"><i class="ri-star-line"></i></div>
+    </div>
+
+    <div class="modal" id="modalAdd">
+        <div class="modal-content">
+            <div class="loader-overlay" id="loader"><div class="spinner"></div><div id="loaderText" style="margin-top:10px; font-size:0.8rem;">กำลังประมวลผล...</div></div>
+            <h3 style="margin-top:0;">เพิ่มสินค้า</h3>
+            
+            <select id="nCatSelect" class="inp" onchange="checkNewCat(this)"></select>
+            <input id="nCatInput" class="inp" placeholder="ชื่อหมวดใหม่..." style="display:none;">
+            <input id="nName" class="inp" placeholder="ชื่อสินค้า">
+            <input id="nCode" class="inp" placeholder="รหัสสินค้า">
+            <div style="font-size:0.8rem; color:var(--text-sub); margin-bottom:5px;">รูปภาพ (ระบบจะย่อรูปให้อัตโนมัติ):</div>
+            <input type="file" id="nFile" class="inp" accept="image/*" style="padding:10px;">
+
+            <button class="btn-gold-full" onclick="saveItem()">บันทึกข้อมูล</button>
+            <div style="display:flex; justify-content:space-between;">
+                <button class="btn-text" onclick="deleteFromModal()" style="color:var(--accent-red); width:auto;">ลบ</button>
+                <button class="btn-text" onclick="closeModal('modalAdd')" style="width:auto;">ปิด</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modalCloud">
+        <div class="modal-content" style="text-align:center;">
+            <div class="loader-overlay" id="cloudLoader"><div class="spinner"></div><div style="margin-top:10px;">ทำงาน...</div></div>
+            <i class="ri-cloud-line" style="font-size:3rem; color:var(--primary);"></i>
+            <h3>ซิงค์ข้อมูล</h3>
+            <button class="btn-gold-full" onclick="pushToCloud(true)" style="margin-bottom:10px; background:var(--accent-green);">อัปโหลด (Save)</button>
+            <button class="btn-gold-full" onclick="pullFromCloud(true)" style="background:#0984e3;">ดาวน์โหลด (Load)</button>
+            <button class="btn-text" onclick="closeModal('modalCloud')">ปิด</button>
+        </div>
+    </div>
+
+    <div class="modal" id="modalSettings">
+        <div class="modal-content">
+            <h3>ตั้งค่า</h3>
+            <div style="font-size:0.8rem; font-weight:bold; color:var(--primary);">1. Google Script URL:</div>
+            <input id="scriptUrl" class="inp" placeholder="URL ข้อมูล...">
+            <div style="font-size:0.8rem; font-weight:bold; color:#e17055;">2. ImgBB API Key:</div>
+            <input id="imgbbKey" class="inp" placeholder="API Key รูปภาพ...">
+            <div style="font-size:0.8rem;">ชื่อร้าน:</div>
+            <input id="shopName" class="inp">
+            
+            <hr style="border:1px dashed #eee; margin:15px 0;">
+            <div id="catManageList" style="margin-bottom:15px; display:flex; flex-wrap:wrap;"></div>
+
+            <button class="btn-gold-full" onclick="saveSettings()">บันทึก</button>
+            <button class="btn-text" onclick="closeModal('modalSettings')">ปิด</button>
+        </div>
+    </div>
+    
+    <div class="modal" id="modalFav"><div class="modal-content"><h3>⭐ รายการโปรด</h3><div id="favList" style="max-height:300px; overflow-y:auto;"></div><button class="btn-text" onclick="closeModal('modalFav')">ปิด</button></div></div>
+    <div class="toast" id="toast">บันทึกเรียบร้อย</div>
+
+<script>
+    // Config & Data
+    let items = JSON.parse(localStorage.getItem('ww_items')) || [];
+    let categories = JSON.parse(localStorage.getItem('ww_cats')) || ['ทั่วไป'];
+    let favoriteIds = JSON.parse(localStorage.getItem('ww_favs')) || [];
+    let config = JSON.parse(localStorage.getItem('ww_config')) || { name: "ร้านวงเวียน", url: "", imgbb: "" };
+    let editingId = null;
+
+    init();
+
+    function init() {
+        document.getElementById('shopName').value = config.name;
+        document.getElementById('brandName').innerText = config.name;
+        document.getElementById('scriptUrl').value = config.url || "";
+        document.getElementById('imgbbKey').value = config.imgbb || "";
+        updateCategories();
+        render();
+        if(items.length===0 && config.url) pullFromCloud(false);
+    }
+
+    function render(filterCat = 'ทั้งหมด') {
+        const grid = document.getElementById('grid');
+        const term = document.getElementById('search').value.toLowerCase();
+        grid.innerHTML = "";
+        const filtered = items.filter(i => {
+            return (filterCat === 'ทั้งหมด' || i.cat === filterCat) &&
+                   (i.name.toLowerCase().includes(term) || i.code.toLowerCase().includes(term));
+        });
+
+        if(filtered.length === 0) {
+            grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:#ccc; margin-top:50px;">ไม่พบสินค้า</div>`;
+            return;
+        }
+
+        filtered.forEach(item => {
+            let img = 'https://via.placeholder.com/400x400/f4f4f4/cccccc?text=No+Image';
+            if (item.img && item.img.length > 5) img = item.img;
+            const isFav = favoriteIds.includes(String(item.id));
+            
+            grid.innerHTML += `
+                <div class="card">
+                    <div class="card-img-wrap" onclick="copy('${item.code}')">
+                        <img src="${img}" class="card-img" referrerpolicy="no-referrer" 
+                             onerror="this.onerror=null; this.src='https://via.placeholder.com/400x400/f4f4f4/999999?text=Re-Upload';">
+                        <div class="card-actions-top">
+                            <div class="btn-icon-mini" onclick="event.stopPropagation(); editItem(${item.id})"><i class="ri-pencil-fill"></i></div>
+                            <div class="btn-icon-mini" onclick="event.stopPropagation(); toggleFav(event, '${item.id}')">
+                                <i class="${isFav ? 'ri-star-fill' : 'ri-star-line'}" style="${isFav ? 'color:#f1c40f' : ''}"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body" onclick="copy('${item.code}')">
+                        <div class="card-name">${item.name}</div>
+                        <div class="card-code">${item.code}</div>
+                        <button class="btn-gold-outline"><i class="ri-file-copy-line"></i> คัดลอกรหัส</button>
+                    </div>
+                </div>`;
+        });
+    }
+
+    function copy(text) { navigator.clipboard.writeText(text).then(() => showToast("คัดลอก: " + text)); }
+
+    // --- 1. COMPRESS IMAGE (หัวใจสำคัญ แก้เน็ตช้า) ---
+    function compressImage(file) {
+        return new Promise(resolve => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = e => {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // กำหนดขนาดสูงสุด 800px (ชัดและเล็กพอ)
+                    const maxWidth = 800;
+                    const scale = maxWidth / img.width;
+                    canvas.width = maxWidth;
+                    canvas.height = img.height * scale;
+                    
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    
+                    // แปลงเป็น Base64 แบบ JPEG Quality 0.7
+                    resolve(canvas.toDataURL('image/jpeg', 0.7));
+                }
+            }
+        });
+    }
+
+    // --- 2. UPLOAD TO IMGBB (ใช้ Base64 ที่ย่อแล้ว) ---
+    async function uploadToImgBB(base64Str) {
+        if(!config.imgbb) throw new Error("ยังไม่ใส่ ImgBB API Key");
+        
+        // ตัดหัว data:image/jpeg;base64, ออกก่อนส่ง
+        const base64Data = base64Str.split(',')[1];
+        
+        const formData = new FormData();
+        formData.append("image", base64Data);
+        
+        const res = await fetch(`https://api.imgbb.com/1/upload?key=${config.imgbb}`, {
+            method: "POST",
+            body: formData
+        });
+        
+        const data = await res.json();
+        if(data.success) {
+            return data.data.url;
+        } else {
+            throw new Error("ImgBB Error: " + (data.error ? data.error.message : "Unknown"));
+        }
+    }
+
+    // --- GOOGLE SHEET SYNC ---
+    async function pushToCloud(manual=false) {
+        if(manual) { document.getElementById('cloudLoader').style.display='flex'; }
+        try {
+            await fetch(config.url + "?action=save", {
+                method: "POST",
+                body: JSON.stringify({ items: items, categories: categories })
+            });
+            if(manual) { showToast("อัปโหลดสำเร็จ ✅"); closeModal('modalCloud'); }
+        } catch(e) { if(manual) alert("Error: " + e); }
+        document.getElementById('cloudLoader').style.display='none';
+    }
+
+    async function pullFromCloud(manual=false) {
+        if(manual) { document.getElementById('cloudLoader').style.display='flex'; }
+        try {
+            const res = await fetch(config.url + "?action=load");
+            const data = await res.json();
+            if(data && data.items) {
+                if(manual) { items = data.items; categories = data.categories || categories; }
+                else {
+                    data.items.forEach(cItem => {
+                        const idx = items.findIndex(l => String(l.id) == String(cItem.id));
+                        if(idx === -1) items.push(cItem);
+                    });
+                }
+                saveLocal(); updateCategories(); render();
+                if(manual) { showToast("ดาวน์โหลดสำเร็จ ✅"); closeModal('modalCloud'); }
+            }
+        } catch(e) { if(manual) alert("เชื่อมต่อไม่ได้"); }
+        document.getElementById('cloudLoader').style.display='none';
+    }
+
+    // --- CRUD (แก้ไขส่วนบันทึกให้ย่อรูปก่อน) ---
+    async function saveItem() {
+        const name = document.getElementById('nName').value;
+        const code = document.getElementById('nCode').value;
+        const catSelect = document.getElementById('nCatSelect');
+        const catInput = document.getElementById('nCatInput');
+        let cat = catSelect.value === 'NEW' ? catInput.value : catSelect.value;
+
+        if(!name) return alert("กรุณาใส่ชื่อสินค้า");
+        if(catSelect.value === 'NEW' && !categories.includes(cat)) { categories.push(cat); updateCategories(); }
+
+        const file = document.getElementById('nFile').files[0];
+        let imgUrl = "";
+        
+        if(editingId) { 
+            const old = items.find(i=>i.id==editingId); 
+            imgUrl = old.img || ""; 
+        }
+
+        if(file) {
+            document.getElementById('loader').style.display='flex';
+            try {
+                document.getElementById('loaderText').innerText = "กำลังย่อรูป...";
+                const compressedBase64 = await compressImage(file);
+                
+                document.getElementById('loaderText').innerText = "กำลังส่งไป ImgBB...";
+                imgUrl = await uploadToImgBB(compressedBase64);
+                
+            } catch(e) {
+                alert("เกิดข้อผิดพลาด: " + e.message);
+                document.getElementById('loader').style.display='none';
+                return;
+            }
+        }
+
+        const newItem = { id: editingId || Date.now(), name, code, cat, img: imgUrl };
+        if(editingId) { items[items.findIndex(i=>i.id==editingId)] = newItem; } 
+        else { items.push(newItem); }
+
+        saveLocal(); render(); pushToCloud(false);
+        document.getElementById('loader').style.display='none';
+        closeModal('modalAdd');
+        showToast("บันทึกเรียบร้อย");
+    }
+
+    function editItem(id) {
+        const i = items.find(x => x.id == id);
+        editingId = id;
+        document.getElementById('nName').value = i.name;
+        document.getElementById('nCode').value = i.code;
+        document.getElementById('nFile').value = ""; 
+        renderCatDropdown(i.cat);
+        openModal('modalAdd');
+    }
+
+    function delItem(id) {
+        if(confirm("ลบรายการนี้?")) {
+            items = items.filter(i => i.id != id);
+            saveLocal(); render(); pushToCloud(false);
+        }
+    }
+
+    // --- UTILS ---
+    function saveLocal() { localStorage.setItem('ww_items', JSON.stringify(items)); localStorage.setItem('ww_cats', JSON.stringify(categories)); }
+    function saveSettings() {
+        config.name = document.getElementById('shopName').value;
+        config.url = document.getElementById('scriptUrl').value;
+        config.imgbb = document.getElementById('imgbbKey').value;
+        localStorage.setItem('ww_config', JSON.stringify(config));
+        document.getElementById('brandName').innerText = config.name;
+        closeModal('modalSettings'); showToast("บันทึกแล้ว");
+    }
+    
+    function updateCategories() { 
+        const h = [`<div class="chip active" onclick="filterCat('ทั้งหมด', this)">ทั้งหมด</div>`]; 
+        categories.forEach(c => h.push(`<div class="chip" onclick="filterCat('${c}', this)">${c}</div>`)); 
+        document.getElementById('catFilters').innerHTML = h.join(''); 
+        document.getElementById('catManageList').innerHTML = categories.map((c,i)=>`<div style="background:#f1f5f9; padding:5px 10px; margin:3px; border-radius:10px; font-size:0.9rem;">${c} <span onclick="delCat(${i})" style="color:var(--accent-red); cursor:pointer; margin-left:5px;">x</span></div>`).join('');
+        renderCatDropdown(); 
+    }
+    function renderCatDropdown(sel="") { let h = categories.map(c=>`<option value="${c}">${c}</option>`); h.push(`<option value="NEW">+ เพิ่มหมวดใหม่...</option>`); document.getElementById('nCatSelect').innerHTML = h.join(''); if(sel) document.getElementById('nCatSelect').value = sel; }
+    function checkNewCat(el) { document.getElementById('nCatInput').style.display = el.value === 'NEW' ? 'block' : 'none'; }
+    function filterCat(c, el) { document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active')); el.classList.add('active'); render(c); }
+    function delCat(i) { if(confirm("ลบหมวดนี้?")) { categories.splice(i,1); saveLocal(); updateCategories(); } }
+    
+    function openModal(id) { document.getElementById(id).style.display='flex'; }
+    function closeModal(id) { document.getElementById(id).style.display='none'; }
+    function openModalAdd() { editingId=null; document.getElementById('nName').value=""; document.getElementById('nCode').value=""; document.getElementById('nFile').value=""; renderCatDropdown(); openModal('modalAdd'); }
+    function deleteFromModal() { if(editingId) { delItem(editingId); closeModal('modalAdd'); } }
+    function openSettings() { 
+        document.getElementById('shopName').value = config.name; 
+        document.getElementById('scriptUrl').value = config.url; 
+        document.getElementById('imgbbKey').value = config.imgbb;
+        openModal('modalSettings'); 
+    }
+    function openCloudMenu() {
+        if(!config.url || !config.imgbb) return alert("กรุณาตั้งค่า URL และ API Key ก่อนครับ");
+        openModal('modalCloud');
+    }
+    function openFavModal() { const l=document.getElementById('favList'); const list = items.filter(i=>favoriteIds.includes(String(i.id))); l.innerHTML = list.length ? list.map(i=>`<div style="padding:15px; border-bottom:1px solid #f0f0f0; cursor:pointer; display:flex; justify-content:space-between;" onclick="copy('${i.code}')"><div>${i.name}</div><div style="color:var(--primary); font-family:monospace;">${i.code}</div></div>`).join('') : '<div style="text-align:center; padding:30px; color:#ccc;">ไม่มีรายการโปรด</div>'; openModal('modalFav'); }
+    function toggleFav(e,id) { e.stopPropagation(); const s=String(id); if(favoriteIds.includes(s)) favoriteIds=favoriteIds.filter(x=>x!==s); else favoriteIds.push(s); localStorage.setItem('ww_favs', JSON.stringify(favoriteIds)); render(); }
+    function showToast(m) { const t=document.getElementById('toast'); t.innerText=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1500); }
+</script>
+</body>
+</html>
