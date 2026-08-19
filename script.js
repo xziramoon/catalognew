@@ -57,6 +57,22 @@ function makePlaceholder(label, fg = "94a3b8", bg = "1e293b") {
 const IMG_PLACEHOLDER = makePlaceholder('NO IMAGE');
 const IMG_ERROR = makePlaceholder('LOAD ERROR', 'fca5a5', '3a1518');
 
+// Old items can end up with a dead image URL (e.g. a free ImgBB-hosted photo that got
+// deleted/expired externally) with no way to recover except editing manually. Turn the
+// broken state into a one-tap fix instead of a dead end.
+function handleImageError(imgEl, itemId) {
+    imgEl.onerror = null;
+    imgEl.src = IMG_ERROR;
+    const wrap = imgEl.closest('.card-img-wrap');
+    if (wrap && !wrap.querySelector('.img-broken-hint')) {
+        const hint = document.createElement('div');
+        hint.className = 'img-broken-hint';
+        hint.innerHTML = '<i class="ri-refresh-line"></i> รูปเสีย แตะเพื่ออัปโหลดใหม่';
+        hint.onclick = (e) => { e.stopPropagation(); editItem(itemId); };
+        wrap.appendChild(hint);
+    }
+}
+
 // --- 2c. DRAFT AUTO-SAVE ---
 // Fixes "ถ้าลืมอัพโหลด แล้วงานหายไปเลย": typed data in the add/edit form used to
 // vanish completely if the modal closed unexpectedly (accidental close, tab crash,
@@ -187,7 +203,7 @@ function buildCard(item) {
         </div>
         <div class="card-img-wrap">
             <img src="${img}" class="card-img" alt="${safeName}" loading="lazy" referrerpolicy="no-referrer"
-                 onerror="this.onerror=null; this.src='${IMG_ERROR}';">
+                 onerror="handleImageError(this, ${item.id})">
             <div class="card-actions-top" style="display: ${STATE.isBulkMode ? 'none' : 'flex'}">
                 <div class="btn-icon-mini" onclick="event.stopPropagation(); editItem(${item.id})"><i class="ri-pencil-line"></i></div>
                 <div class="btn-icon-mini" onclick="event.stopPropagation(); toggleFav('${item.id}')">
